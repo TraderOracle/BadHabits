@@ -82,7 +82,7 @@ public class BadHabits : ATAS.Strategies.Chart.ChartStrategy
 
         upY += tsize.Height + 6;
 
-        //if (buyMe || CurrentPosition < 0)
+        if (buyMe || CurrentPosition < 0)
         {
             greenButton = new Rectangle(50, upY, 50, 25);
             context.DrawRectangle(RenderPens.Lime, greenButton);
@@ -90,7 +90,7 @@ public class BadHabits : ATAS.Strategies.Chart.ChartStrategy
             context.DrawString("   BUY", fontB, Color.Black, greenButton);
         }
 
-        //if (sellMe || CurrentPosition > 0)
+        if (sellMe || CurrentPosition > 0)
         {
             redButton = new Rectangle(150, upY, 50, 25);
             context.DrawRectangle(RenderPens.Red, redButton);
