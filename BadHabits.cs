@@ -10,6 +10,7 @@ using Color = System.Drawing.Color;
 using OFT.Rendering.Control;
 using ATAS.Indicators.Drawing;
 using System.Windows.Media;
+using System.ComponentModel.DataAnnotations;
 
 public class BadHabits : ATAS.Strategies.Chart.ChartStrategy
 {
@@ -23,6 +24,9 @@ public class BadHabits : ATAS.Strategies.Chart.ChartStrategy
     private Stopwatch clock = new Stopwatch();
     private bool buyMe;
     private bool sellMe;
+    private int iMaxProfit = 500;
+    private int iMaxLoss = 1000;
+    private int iTrades = 1000;
 
     #endregion
 
@@ -38,31 +42,27 @@ public class BadHabits : ATAS.Strategies.Chart.ChartStrategy
 
     #endregion
 
+    [Display(GroupName = "Limits", Name = "Max Daily Loss", Description = "")]
+    [Range(0, 1000)]
+    public int MaxLoss { get => iMaxLoss; set { if (value < 0) return; iMaxLoss = value; RecalculateValues(); } }
+    [Display(GroupName = "Limits", Name = "Max Daily Profit", Description = "")]
+    [Range(0, 1000)]
+    public int MaxProfit { get => iMaxProfit; set { if (value < 0) return; iMaxProfit = value; RecalculateValues(); } }
+    [Display(GroupName = "Limits", Name = "Max Daily Trades", Description = "")]
+    [Range(0, 1000)]
+    public int Trades { get => iTrades; set { if (value < 0) return; iTrades = value; RecalculateValues(); } }
+
+
+
     #region RENDER CONTEXT
 
     protected override void OnRender(RenderContext context, DrawingLayouts layout)
     {
         var font = new RenderFont("Calibri", 10);
-        var fontB = new RenderFont("Calibri", 14, FontStyle.Bold);
+        var fontB = new RenderFont("Calibri", 10, FontStyle.Bold);
         int upY = 50;
         int upX = 50;
         var txt = String.Empty;
-
-        if (buyMe || CurrentPosition < 0)
-        {
-            greenButton = new Rectangle(ChartArea.Width - 200, 350, 50, 25);
-            context.DrawRectangle(RenderPens.Lime, greenButton);
-            context.FillRectangle(cgreen, greenButton);
-            context.DrawString("   BUY", fontB, Color.Black, greenButton);
-        }
-
-        if (sellMe || CurrentPosition > 0)
-        { 
-            redButton = new Rectangle(ChartArea.Width - 200, 250, 50, 25);
-            context.DrawRectangle(RenderPens.Red, redButton);
-            context.FillRectangle(cred, redButton);
-            context.DrawString("   SELL", fontB, Color.White, redButton);
-        }
 
         TimeSpan t = TimeSpan.FromMilliseconds(clock.ElapsedMilliseconds);
         String an = String.Format("{0:D2}:{1:D2}:{2:D2}", t.Hours, t.Minutes, t.Seconds);
@@ -79,6 +79,25 @@ public class BadHabits : ATAS.Strategies.Chart.ChartStrategy
             txt = $"{TradingManager.MyTrades.Count()} trades, with PNL: {TradingManager.Position.RealizedPnL}";
             context.DrawString(txt, font, Color.White, upX, upY);
         }
+
+        upY += tsize.Height + 6;
+
+        //if (buyMe || CurrentPosition < 0)
+        {
+            greenButton = new Rectangle(50, upY, 50, 25);
+            context.DrawRectangle(RenderPens.Lime, greenButton);
+            context.FillRectangle(cgreen, greenButton);
+            context.DrawString("   BUY", fontB, Color.Black, greenButton);
+        }
+
+        //if (sellMe || CurrentPosition > 0)
+        {
+            redButton = new Rectangle(150, upY, 50, 25);
+            context.DrawRectangle(RenderPens.Red, redButton);
+            context.FillRectangle(cred, redButton);
+            context.DrawString("   SELL", fontB, Color.White, redButton);
+        }
+
     }
 
     #endregion
